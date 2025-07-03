@@ -9,19 +9,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout
+    - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Set up Docker
+    - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
 
-    - name: Build & Push Image
-      run: |
-        docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/backend-app:${{ github.sha }} ./backend
-        echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
-        docker push ${{ secrets.DOCKERHUB_USERNAME }}/backend-app:${{ github.sha }}
+    - name: Docker Login
+      run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
-    - name: Deploy to EC2
+    - name: Build & Push Docker Image
+      run: |
+        docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/backend-app:${{ github.sha }} -t ${{ secrets.DOCKERHUB_USERNAME }}/backend-app:latest ./backend
+        docker push ${{ secrets.DOCKERHUB_USERNAME }}/backend-app:${{ github.sha }}
+        docker push ${{ secrets.DOCKERHUB_USERNAME }}/backend-app:latest
+
+    - name: Deploy to EC2 via SSH
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.EC2_HOST }}
@@ -31,6 +34,6 @@ jobs:
           cd backend-devops
           git pull origin main
           docker-compose down
-          docker-compose up -d --build
-
+          docker-compose pull
+          docker-compose up -d
 
