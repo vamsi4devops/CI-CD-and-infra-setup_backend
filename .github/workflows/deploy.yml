@@ -20,7 +20,7 @@ jobs:
 
     - name: Build & Push Docker Image
       run: |
-        docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/backend-app:${{ github.sha }} -t ${{ secrets.DOCKERHUB_USERNAME }}/backend-app:latest ./backend
+        docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/backend-app:${{ github.sha }} -t ${{ secrets.DOCKERHUB_USERNAME }}/backend-app:latest .
         docker push ${{ secrets.DOCKERHUB_USERNAME }}/backend-app:${{ github.sha }}
         docker push ${{ secrets.DOCKERHUB_USERNAME }}/backend-app:latest
 
