@@ -31,7 +31,7 @@ jobs:
         username: ubuntu
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
-          cd backend-devops
+          cd backend
           git pull origin main
           docker-compose down
           docker-compose pull
